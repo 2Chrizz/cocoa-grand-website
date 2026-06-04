@@ -1,0 +1,192 @@
+const cart = JSON.parse(localStorage.getItem("cart") || "[]");
+
+/* ========================= */
+/* ELEMENTE */
+/* ========================= */
+
+const cartBtn = document.getElementById("cart-btn");
+const cartSidebar = document.getElementById("cart-sidebar");
+const closeCart = document.getElementById("close-cart");
+const cartItems = document.getElementById("cart-items");
+const cartTotal = document.getElementById("cart-total");
+const cartCount = document.getElementById("cart-count");
+
+/* ========================= */
+/* CART TOGGLE */
+/* ========================= */
+
+cartBtn.onclick = () => {
+  cartSidebar.classList.add("open");
+};
+closeCart.onclick = () => {
+  cartSidebar.classList.remove("open");
+};
+
+/* ========================= */
+/* PRODUKT MENGENWAHL */
+/* ========================= */
+
+document.querySelectorAll(".plus").forEach((btn) => {
+  btn.addEventListener("click", () => {
+    const input = btn.parentElement.querySelector(".qty-input");
+    input.value = parseInt(input.value) + 1;
+  });
+});
+document.querySelectorAll(".minus").forEach((btn) => {
+  btn.addEventListener("click", () => {
+    const input = btn.parentElement.querySelector(".qty-input");
+    let value = parseInt(input.value);
+    if (value > 1) {
+      input.value = value - 1;
+    }
+  });
+});
+/* ========================= */
+/* MENGENEINGABE VALIDIEREN */
+/* ========================= */
+
+document.querySelectorAll(".qty-input").forEach((input) => {
+  function validate() {
+    let value = parseInt(input.value);
+    if (isNaN(value)) value = 1;
+    value = Math.max(1, value);
+    value = Math.min(99, value);
+    input.value = value;
+  }
+  input.addEventListener("input", validate);
+  input.addEventListener("blur", validate);
+});
+
+/* ========================= */
+/* IN DEN WARENKORB */
+/* ========================= */
+
+document.querySelectorAll(".add-to-cart").forEach((button) => {
+  button.addEventListener("click", () => {
+    const card = button.closest(".product-card");
+    const qtyInput = card.querySelector(".qty-input");
+    let qty = parseInt(qtyInput.value);
+    if (isNaN(qty)) qty = 1;
+    qty = Math.max(1, qty);
+    qty = Math.min(99, qty);
+    qtyInput.value = qty;
+    const id = button.dataset.id;
+    const existing = cart.find((item) => item.id === id);
+    if (existing) {
+      existing.qty += qty;
+    } else {
+      cart.push({
+        id: id,
+        name: button.dataset.name,
+        size: button.dataset.size,
+        price: parseFloat(button.dataset.price),
+        qty: qty,
+      });
+    }
+    qtyInput.value = 1;
+    updateCart();
+    cartSidebar.classList.add("open");
+  });
+});
+/* ========================= */
+/* CART RENDER */
+/* ========================= */
+
+function updateCart() {
+  cartItems.innerHTML = "";
+  let total = 0;
+  let count = 0;
+  if (cart.length === 0) {
+    cartItems.innerHTML = `<div class="empty-cart">
+            Dein Warenkorb ist leer.
+        </div>`;
+    cartTotal.textContent = "0,00 €";
+    cartCount.textContent = "0";
+    localStorage.setItem("cart", JSON.stringify(cart));
+    return;
+  }
+
+  cart.forEach((item) => {
+    const subtotal = item.qty * item.price;
+    total += subtotal;
+    count += item.qty;
+    cartItems.innerHTML += `
+        <div class="cart-item">
+            <div class="cart-item-header">
+                <strong>
+                    ${item.name}
+                </strong>
+                <button
+                    class="remove-item"
+                    onclick="removeItem('${item.id}')">
+                    <i class="fa-solid fa-trash-can"></i>
+                </button>
+            </div>
+            <div class="cart-size">
+                ${item.size}
+            </div>
+            <div class="cart-qty">
+                <button
+                    onclick="changeQty('${item.id}',-1)">
+                    -
+                </button>
+                <span>
+                    ${item.qty}
+                </span>
+                <button
+                    onclick="changeQty('${item.id}',1)">
+                    +
+                </button>
+            </div>
+            <div class="cart-price">
+                ${subtotal.toFixed(2)} €
+            </div>
+        </div>
+        `;
+  });
+
+  cartTotal.textContent = total.toFixed(2) + " €";
+  cartCount.textContent = count;
+  localStorage.setItem("cart", JSON.stringify(cart));
+}
+
+/* ========================= */
+/* MENGE ÄNDERN */
+/* ========================= */
+
+function changeQty(id, amount) {
+  const item = cart.find((item) => item.id === id);
+  if (!item) return;
+  item.qty += amount;
+  if (item.qty <= 0) {
+    removeItem(id);
+    return;
+  }
+
+  updateCart();
+}
+/* ========================= */
+/* PRODUKT ENTFERNEN */
+/* ========================= */
+
+function removeItem(id) {
+  const index = cart.findIndex((item) => item.id === id);
+  if (index > -1) {
+    cart.splice(index, 1);
+  }
+  updateCart();
+}
+updateCart();
+
+const checkoutBtn = document.getElementById("checkout-btn");
+
+if (checkoutBtn) {
+  checkoutBtn.addEventListener("click", () => {
+    if (cart.length === 0) {
+      alert("Dein Warenkorb ist leer.");
+      return;
+    }
+
+    window.location.href = "checkout.html";
+  });
+}

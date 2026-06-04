@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Checkout | COCOA GRAND</title>
+
+    <link rel="stylesheet" href="css/style.css">
+
+    <style>
+        .checkout-container {
+            max-width: 900px;
+            margin: 120px auto;
+            padding: 20px;
+        }
+
+        .checkout-box {
+            background: var(--card);
+            padding: 30px;
+            border-radius: 16px;
+        }
+
+        .checkout-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, .1);
+        }
+
+        .checkout-summary {
+            margin-top: 30px;
+        }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+        }
+
+        .summary-total {
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin-top: 15px;
+        }
+
+        #paypal-button-container {
+            margin-top: 30px;
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+</head>
+
+<body>
+
+    <div class="checkout-container">
+
+        <h1>Checkout</h1>
+
+        <div class="checkout-box">
+
+            <div id="checkout-items"></div>
+
+            <div class="checkout-summary">
+
+                <div class="summary-row">
+                    <span>Zwischensumme</span>
+                    <span id="subtotal">0,00 €</span>
+                </div>
+
+                <div class="summary-row">
+                    <span>Versand</span>
+                    <span id="shipping">0,00 €</span>
+                </div>
+
+                <div class="summary-row summary-total">
+                    <span>Gesamt</span>
+                    <span id="total">0,00 €</span>
+                </div>
+
+                <p class="checkout-legal">
+
+                    Mit Abschluss der Bestellung akzeptieren Sie unsere
+
+                    <a href="agb.html">AGB</a>,
+                    <a href="widerruf.html">Widerrufsbelehrung</a>
+                    und
+                    <a href="datenschutz.html">Datenschutzerklärung</a>.
+
+                </p>
+
+            </div>
+
+            <div id="paypal-button-container"></div>
+
+            <div class="shop-info">
+
+                <div class="shop-info-item">
+                    <i class="fa-solid fa-truck"></i>
+                    Versand in 2–4 Werktagen
+                </div>
+
+                <div class="shop-info-item">
+                    <i class="fa-solid fa-shield-halved"></i>
+                    Sichere Zahlung mit PayPal
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <script src="https://www.paypal.com/sdk/js?client-id=Ac4DxvlVow2_0I7rIbtTTBKDcIgQpVpROfQQYiIyaHHnWQGEB_Us8VclfRc-ESbF5HMvGcaxWZH92hxy&currency=EUR"></script>
+
+    <script>
+
+        const cart =
+            JSON.parse(localStorage.getItem("cart")) || [];
+
+        if (cart.length === 0) {
+
+            window.location.href = "index.html";
+
+        }
+
+        const checkoutItems =
+            document.getElementById("checkout-items");
+
+        let subtotal = 0;
+
+        cart.forEach(item => {
+
+            const itemTotal =
+                item.price * item.qty;
+
+            subtotal += itemTotal;
+
+            checkoutItems.innerHTML += `
+
+<div class="checkout-item">
+
+  <div>
+
+    <div class="checkout-product-name">
+      ${item.name}
+    </div>
+
+    <div class="checkout-product-size">
+      ${item.size}
+    </div>
+
+    <div class="checkout-product-qty">
+      Menge: ${item.qty}
+    </div>
+
+  </div>
+
+  <div class="checkout-product-price">
+    ${itemTotal.toFixed(2)} €
+  </div>
+
+</div>
+
+`;
+
+        });
+
+        let shipping = 0;
+
+        if (subtotal < 39.99) {
+            shipping = 4.99;
+        }
+
+        const total =
+            subtotal + shipping;
+
+        document.getElementById("subtotal")
+            .textContent =
+            subtotal.toFixed(2) + " €";
+
+        document.getElementById("shipping")
+            .textContent =
+            shipping.toFixed(2) + " €";
+
+        document.getElementById("total")
+            .textContent =
+            total.toFixed(2) + " €";
+
+        paypal.Buttons({
+
+            createOrder(data, actions) {
+
+                return actions.order.create({
+
+                    purchase_units: [{
+
+                        amount: {
+                            currency_code: "EUR",
+                            value: total.toFixed(2),
+
+                            breakdown: {
+                                item_total: {
+                                    currency_code: "EUR",
+                                    value: subtotal.toFixed(2)
+                                },
+
+                                shipping: {
+                                    currency_code: "EUR",
+                                    value: shipping.toFixed(2)
+                                }
+                            }
+                        },
+
+                        items: cart.map(item => ({
+                            name:
+                                item.name + " " + item.size,
+
+                            unit_amount: {
+                                currency_code: "EUR",
+                                value: item.price.toFixed(2)
+                            },
+
+                            quantity:
+                                item.qty.toString()
+                        }))
+
+                    }]
+
+                });
+
+            },
+
+            onApprove(data, actions) {
+
+                return actions.order.capture()
+                    .then(function (details) {
+
+                        localStorage.removeItem("cart");
+
+                        window.location.href =
+                            "success.html";
+
+                    });
+
+            }
+
+        }).render("#paypal-button-container");
+
+    </script>
+
+</body>
+
+</html>
