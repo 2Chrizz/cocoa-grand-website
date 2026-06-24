@@ -192,6 +192,7 @@
 
         };
 
+        // Produkte aus Warenkorb anzeigen
         cart.forEach(item => {
 
             const itemTotal =
@@ -201,78 +202,87 @@
 
             checkoutItems.innerHTML += `
 
-<div class="checkout-item">
+    <div class="checkout-item">
 
-  <div>
+        <div>
 
-    <div class="checkout-product-name">
-      ${item.name}
+            <div class="checkout-product-name">
+                ${item.name}
+            </div>
+
+            <div class="checkout-product-size">
+                ${item.size}
+            </div>
+
+            <div class="checkout-product-qty">
+                Menge: ${item.qty}
+            </div>
+
+        </div>
+
+        <div class="checkout-product-price">
+            ${itemTotal.toFixed(2)} €
+        </div>
+
     </div>
 
-    <div class="checkout-product-size">
-      ${item.size}
-    </div>
-
-    <div class="checkout-product-qty">
-      Menge: ${item.qty}
-    </div>
-
-  </div>
-
-  <div class="checkout-product-price">
-    ${itemTotal.toFixed(2)} €
-  </div>
-
-</div>
-
-`;
+    `;
 
         });
 
-        let shipping = 0;
-
-        if (subtotal < 39.99) {
-            shipping = 4.99;
-        }
-
-        let total = 0;
-
-        function updateTotals() {
-
-            const effectiveSubtotal = subtotal - discountAmount;
-
-                shipping = effectiveSubtotal < 39.99 ? 4.99 : 0;
-
-            const discountedSubtotal =
-                subtotal - discountAmount;
+        // Zentrale Preisberechnung
+        function getPriceData() {
 
             const safeSubtotal =
-                Math.max(0, discountedSubtotal);
+                Math.max(0, subtotal - discountAmount);
 
-            const totalValue =
+            const shipping =
+                safeSubtotal < 39.99 ? 4.99 : 0;
+
+            const total =
                 safeSubtotal + shipping;
 
-            document.getElementById("subtotal")
-                .textContent =
-                subtotal.toFixed(2) + " €";
+            return {
 
-            document.getElementById("shipping")
-                .textContent =
-                shipping.toFixed(2) + " €";
+                safeSubtotal,
 
-            document.getElementById("discount")
-                .textContent =
-                "-" + discountAmount.toFixed(2) + " €";
+                shipping,
 
-            document.getElementById("total")
-                .textContent =
-                totalValue.toFixed(2) + " €";
+                total,
 
-            return totalValue;
+                itemTotal:
+                    Number(subtotal.toFixed(2)),
+
+                discount:
+                    Number(discountAmount.toFixed(2))
+
+            };
+
         }
 
-        total = updateTotals();
+        // Preise im Frontend aktualisieren
+        function updateTotals() {
 
+            const prices =
+                getPriceData();
+
+            document.getElementById("subtotal").textContent =
+                subtotal.toFixed(2) + " €";
+
+            document.getElementById("shipping").textContent =
+                prices.shipping.toFixed(2) + " €";
+
+            document.getElementById("discount").textContent =
+                "-" + prices.discount.toFixed(2) + " €";
+
+            document.getElementById("total").textContent =
+                prices.total.toFixed(2) + " €";
+
+        }
+
+        updateTotals();
+
+        // Rabattcode einlösen
         document
             .getElementById("apply-discount")
             .addEventListener("click", () => {
@@ -292,81 +302,152 @@
 
                 // 1. Code existiert nicht
                 if (!entry) {
-                    msg.textContent = "Ungültiger Rabattcode.";
+
+                    msg.textContent =
+                        "Ungültiger Rabattcode.";
+
                     return;
+
                 }
 
                 // 2. Ablaufdatum prüfen
-                const today = new Date();
-                const expiry = new Date(entry.expires);
+                const today =
+                    new Date();
+
+                const expiry =
+                    new Date(
+                        entry.expires + "T23:59:59"
+                    );
 
                 if (today > expiry) {
-                    msg.textContent = "Dieser Rabattcode ist abgelaufen.";
+
+                    msg.textContent =
+                        "Dieser Rabattcode ist abgelaufen.";
+
                     return;
+
                 }
 
                 // 3. Rabatt berechnen
-                discountPercent = entry.percent;
+                discountPercent =
+                    entry.percent;
 
                 discountAmount =
-                    subtotal * (discountPercent / 100);
+                    subtotal *
+                    (discountPercent / 100);
+
+                discountAmount =
+                    Number(
+                        discountAmount.toFixed(2)
+                    );
 
                 // 4. Preise neu berechnen
-                total = updateTotals();
+                updateTotals();
 
                 msg.textContent =
                     `Code ${code} angewendet: ${discountPercent}% Rabatt!`;
 
             });
 
+        // PayPal
         paypal.Buttons({
 
             createOrder(data, actions) {
+
+                const prices =
+                    getPriceData();
+
+                const finalTotal =
+                    (
+                        prices.itemTotal +
+                        prices.shipping -
+                        prices.discount
+                    ).toFixed(2);
+
+                console.log("subtotal:", prices.itemTotal);
+                console.log("discount:", prices.discount);
+                console.log("shipping:", prices.shipping);
+                console.log("total:", finalTotal);
 
                 return actions.order.create({
 
                     purchase_units: [{
 
                         amount: {
+
                             currency_code: "EUR",
-                            value: (total || 0).toFixed(2),
+
+                            value: finalTotal,
 
                             breakdown: {
+
                                 item_total: {
                                     currency_code: "EUR",
-                                    value: Math.max(0, subtotal - discountAmount).toFixed(2)
+                                    value:
+                                        prices.itemTotal.toFixed(2)
                                 },
 
                                 shipping: {
                                     currency_code: "EUR",
-                                    value: shipping.toFixed(2)
+                                    value:
+                                        prices.shipping.toFixed(2)
+                                },
+
+                                discount: {
+                                    currency_code: "EUR",
+                                    value:
+                                        prices.discount.toFixed(2)
                                 }
+
                             }
+
                         },
 
                         items: cart.map(item => ({
+
                             name:
-                                item.name + " " + item.size,
+                                item.name +
+                                " " +
+                                item.size,
 
                             unit_amount: {
                                 currency_code: "EUR",
-                                value: item.price.toFixed(2)
+                                value:
+                                    Number(item.price)
+                                        .toFixed(2)
                             },
 
                             quantity:
                                 item.qty.toString()
+
                         }))
 
                     }]
 
-                });
+                })
+
+                    .catch(err => {
+
+                        console.error(
+                            "CREATE ORDER ERROR:",
+                            err
+                        );
+
+                        throw err;
+
+                    });
 
             },
 
             onApprove(data, actions) {
 
                 return actions.order.capture()
-                    .then(function (details) {
+                    .then(details => {
+
+                        console.log(
+                            "Zahlung erfolgreich:",
+                            details
+                        );
 
                         localStorage.removeItem("cart");
 
@@ -374,6 +455,19 @@
                             "success.html";
 
                     });
+
+            },
+
+            onError(err) {
+
+                console.error(
+                    "PayPal Error:",
+                    err
+                );
+
+                alert(
+                    "Bei der PayPal-Zahlung ist ein Fehler aufgetreten."
+                );
 
             }
 
