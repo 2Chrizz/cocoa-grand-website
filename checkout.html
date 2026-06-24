@@ -185,7 +185,7 @@
 
         const discountCodes = {
 
-            "SOMMER": {
+            "SOMMER2026": {
                 percent: 26,
                 expires: "2026-06-29"
             }
@@ -239,11 +239,18 @@
 
         function updateTotals() {
 
+            const effectiveSubtotal = subtotal - discountAmount;
+
+                shipping = effectiveSubtotal < 39.99 ? 4.99 : 0;
+
             const discountedSubtotal =
                 subtotal - discountAmount;
 
-            total =
-                discountedSubtotal + shipping;
+            const safeSubtotal =
+                Math.max(0, discountedSubtotal);
+
+            const totalValue =
+                safeSubtotal + shipping;
 
             document.getElementById("subtotal")
                 .textContent =
@@ -259,10 +266,12 @@
 
             document.getElementById("total")
                 .textContent =
-                total.toFixed(2) + " €";
+                totalValue.toFixed(2) + " €";
+
+            return totalValue;
         }
 
-        updateTotals();
+        total = updateTotals();
 
         document
             .getElementById("apply-discount")
@@ -303,7 +312,7 @@
                     subtotal * (discountPercent / 100);
 
                 // 4. Preise neu berechnen
-                updateTotals();
+                total = updateTotals();
 
                 msg.textContent =
                     `Code ${code} angewendet: ${discountPercent}% Rabatt!`;
@@ -320,12 +329,12 @@
 
                         amount: {
                             currency_code: "EUR",
-                            value: total.toFixed(2),
+                            value: (total || 0).toFixed(2),
 
                             breakdown: {
                                 item_total: {
                                     currency_code: "EUR",
-                                    value: subtotal.toFixed(2)
+                                    value: Math.max(0, subtotal - discountAmount).toFixed(2)
                                 },
 
                                 shipping: {
