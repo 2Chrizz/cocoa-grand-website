@@ -1,17 +1,17 @@
 <!DOCTYPE html>
 <html lang="de">
 
-<head>
+    <head>
 
-    <meta charset="UTF-8">
+        <meta charset="UTF-8">
 
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Checkout | COCOA GRAND</title>
+        <title>Checkout | COCOA GRAND</title>
 
-    <link rel="stylesheet" href="css/style.css">
+        <link rel="stylesheet" href="css/style.css">
 
-    <style>
+        <style>
         .checkout-container {
             max-width: 900px;
             margin: 120px auto;
@@ -51,80 +51,120 @@
         #paypal-button-container {
             margin-top: 30px;
         }
+
+        .discount-box {
+            margin: 20px 0;
+        }
+
+        .discount-box input {
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid #444;
+        }
+
+        .discount-box button {
+            padding: 10px 15px;
+            margin-left: 10px;
+            cursor: pointer;
+        }
+
+        #discount-message {
+            margin-top: 10px;
+            font-size: 0.9rem;
+        }
     </style>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+        <link rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
-</head>
+    </head>
 
-<body>
+    <body>
 
-    <div class="checkout-container">
+        <div class="checkout-container">
 
-        <h1>Checkout</h1>
+            <h1>Checkout</h1>
 
-        <div class="checkout-box">
+            <div class="checkout-box">
 
-            <div id="checkout-items"></div>
+                <div id="checkout-items"></div>
 
-            <div class="checkout-summary">
+                <div class="discount-box">
 
-                <div class="summary-row">
-                    <span>Zwischensumme</span>
-                    <span id="subtotal">0,00 €</span>
+                    <input type="text" id="discount-code"
+                        placeholder="Rabattcode eingeben">
+
+                    <button id="apply-discount">
+                        Einlösen
+                    </button>
+
+                    <div id="discount-message"></div>
+
                 </div>
 
-                <div class="summary-row">
-                    <span>Versand</span>
-                    <span id="shipping">0,00 €</span>
+                <div class="checkout-summary">
+
+                    <div class="summary-row">
+                        <span>Zwischensumme</span>
+                        <span id="subtotal">0,00 €</span>
+                    </div>
+
+                    <div class="summary-row">
+                        <span>Versand</span>
+                        <span id="shipping">0,00 €</span>
+                    </div>
+
+                    <div class="summary-row">
+                        <span>Rabatt</span>
+                        <span id="discount">0,00 €</span>
+                    </div>
+
+                    <div class="summary-row summary-total">
+                        <span>Gesamt</span>
+                        <span id="total">0,00 €</span>
+                    </div>
+
+                    <p class="checkout-legal">
+
+                        Mit Abschluss der Bestellung akzeptieren Sie unsere
+
+                        <a href="agb.html">AGB</a>,
+                        <a href="widerruf.html">Widerrufsbelehrung</a>
+                        und
+                        <a href="datenschutz.html">Datenschutzerklärung</a>.
+
+                    </p>
+
                 </div>
 
-                <div class="summary-row summary-total">
-                    <span>Gesamt</span>
-                    <span id="total">0,00 €</span>
-                </div>
+                <div id="paypal-button-container"></div>
 
-                <p class="checkout-legal">
+                <div class="shop-info">
 
-                    Mit Abschluss der Bestellung akzeptieren Sie unsere
+                    <div class="shop-info-item">
+                        <i class="fa-solid fa-shield-halved"></i>
+                        Sichere Zahlung mit PayPal
+                    </div>
 
-                    <a href="agb.html">AGB</a>,
-                    <a href="widerruf.html">Widerrufsbelehrung</a>
-                    und
-                    <a href="datenschutz.html">Datenschutzerklärung</a>.
+                    <div class="shop-info-item">
+                        <i class="fa-solid fa-box"></i>
+                        Versandfrei ab 39,99 €
+                    </div>
 
-                </p>
+                    <div class="shop-info-item">
+                        <i class="fa-solid fa-truck"></i>
+                        Versand in 2–4 Werktagen
+                    </div>
 
-            </div>
-
-            <div id="paypal-button-container"></div>
-
-            <div class="shop-info">
-
-                <div class="shop-info-item">
-                    <i class="fa-solid fa-shield-halved"></i>
-                    Sichere Zahlung mit PayPal
-                </div>
-
-                <div class="shop-info-item">
-                    <i class="fa-solid fa-box"></i>
-                    Versandfrei ab 39,99 €
-                </div>
-
-                <div class="shop-info-item">
-                    <i class="fa-solid fa-truck"></i>
-                    Versand in 2–4 Werktagen
                 </div>
 
             </div>
 
         </div>
 
-    </div>
+        <script
+            src="https://www.paypal.com/sdk/js?client-id=Ac4DxvlVow2_0I7rIbtTTBKDcIgQpVpROfQQYiIyaHHnWQGEB_Us8VclfRc-ESbF5HMvGcaxWZH92hxy&currency=EUR"></script>
 
-    <script
-        src="https://www.paypal.com/sdk/js?client-id=Ac4DxvlVow2_0I7rIbtTTBKDcIgQpVpROfQQYiIyaHHnWQGEB_Us8VclfRc-ESbF5HMvGcaxWZH92hxy&currency=EUR"></script>
-
-    <script>
+        <script>
 
         const cart =
             JSON.parse(localStorage.getItem("cart")) || [];
@@ -139,6 +179,18 @@
             document.getElementById("checkout-items");
 
         let subtotal = 0;
+
+        let discountAmount = 0;
+        let discountPercent = 0;
+
+        const discountCodes = {
+
+            "SOMMER": {
+                percent: 26,
+                expires: "2026-06-29"
+            }
+
+        };
 
         cart.forEach(item => {
 
@@ -183,20 +235,80 @@
             shipping = 4.99;
         }
 
-        const total =
-            subtotal + shipping;
+        let total = 0;
 
-        document.getElementById("subtotal")
-            .textContent =
-            subtotal.toFixed(2) + " €";
+        function updateTotals() {
 
-        document.getElementById("shipping")
-            .textContent =
-            shipping.toFixed(2) + " €";
+            const discountedSubtotal =
+                subtotal - discountAmount;
 
-        document.getElementById("total")
-            .textContent =
-            total.toFixed(2) + " €";
+            total =
+                discountedSubtotal + shipping;
+
+            document.getElementById("subtotal")
+                .textContent =
+                subtotal.toFixed(2) + " €";
+
+            document.getElementById("shipping")
+                .textContent =
+                shipping.toFixed(2) + " €";
+
+            document.getElementById("discount")
+                .textContent =
+                "-" + discountAmount.toFixed(2) + " €";
+
+            document.getElementById("total")
+                .textContent =
+                total.toFixed(2) + " €";
+        }
+
+        updateTotals();
+
+        document
+            .getElementById("apply-discount")
+            .addEventListener("click", () => {
+
+                const code =
+                    document
+                        .getElementById("discount-code")
+                        .value
+                        .trim()
+                        .toUpperCase();
+
+                const msg =
+                    document.getElementById("discount-message");
+
+                const entry =
+                    discountCodes[code];
+
+                // 1. Code existiert nicht
+                if (!entry) {
+                    msg.textContent = "Ungültiger Rabattcode.";
+                    return;
+                }
+
+                // 2. Ablaufdatum prüfen
+                const today = new Date();
+                const expiry = new Date(entry.expires);
+
+                if (today > expiry) {
+                    msg.textContent = "Dieser Rabattcode ist abgelaufen.";
+                    return;
+                }
+
+                // 3. Rabatt berechnen
+                discountPercent = entry.percent;
+
+                discountAmount =
+                    subtotal * (discountPercent / 100);
+
+                // 4. Preise neu berechnen
+                updateTotals();
+
+                msg.textContent =
+                    `Code ${code} angewendet: ${discountPercent}% Rabatt!`;
+
+            });
 
         paypal.Buttons({
 
@@ -260,6 +372,6 @@
 
     </script>
 
-</body>
+    </body>
 
 </html>
