@@ -141,6 +141,13 @@ ul {
 /* CART */
 /* ======================================== */
 
+.cart-checkout {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
 .cart-btn {
   position: relative;
   border: none;
