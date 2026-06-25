@@ -311,16 +311,18 @@
 
         const shippingCents = discountedSubtotal < 3999 ? 395 : 0;
 
+        const totalCents = discountedSubtotal + shippingCents;
+
         return {
             itemTotal: subtotalCents / 100,
             discount: discountCents / 100,
             shipping: shippingCents / 100,
-            total: (discountedSubtotal + shippingCents) / 100
+            total: totalCents / 100
         };
     }
 
     /* ========================================
-       PAYPAL (WICHTIG: nur 1x rendern!)
+   PAYPAL
     ======================================== */
 
     let paypalButtonsInstance = null;
@@ -332,38 +334,49 @@
 
         container.innerHTML = "";
 
-        const prices = getPriceData();
-
         paypalButtonsInstance = paypal.Buttons({
 
             createOrder(data, actions) {
 
                 const p = getPriceData();
 
+                // WICHTIG: alles in Cents rechnen (PayPal-safe)
+                const itemTotalCents = Math.round((p.itemTotal - p.discount) * 100);
+                const shippingCents = Math.round(p.shipping * 100);
+                const totalCents = itemTotalCents + shippingCents;
+
                 return actions.order.create({
                     purchase_units: [{
                         amount: {
                             currency_code: "EUR",
-                            value: p.total.toFixed(2),
+
+                            value: (totalCents / 100).toFixed(2),
+
                             breakdown: {
                                 item_total: {
                                     currency_code: "EUR",
-                                    value: (p.itemTotal - p.discount).toFixed(2)
+                                    value: (itemTotalCents / 100).toFixed(2)
                                 },
                                 shipping: {
                                     currency_code: "EUR",
-                                    value: p.shipping.toFixed(2)
+                                    value: (shippingCents / 100).toFixed(2)
                                 }
                             }
                         },
-                        items: cart.map(item => ({
-                            name: item.name + (item.size ? ` ${item.size}` : ""),
-                            quantity: String(Math.max(1, parseInt(item.qty, 10))),
-                            unit_amount: {
-                                currency_code: "EUR",
-                                value: Number(item.price).toFixed(2)
-                            }
-                        }))
+
+                        items: cart.map(item => {
+                            const price = Number(item.price);
+                            const qty = Math.max(1, Number(item.qty));
+
+                            return {
+                                name: item.name + (item.size ? ` ${item.size}` : ""),
+                                quantity: String(qty),
+                                unit_amount: {
+                                    currency_code: "EUR",
+                                    value: price.toFixed(2)
+                                }
+                            };
+                        })
                     }]
                 });
             },
@@ -371,8 +384,10 @@
             async onApprove(data, actions) {
                 try {
                     await actions.order.capture();
+
                     localStorage.removeItem("cart");
                     window.location.href = "success.html";
+
                 } catch (err) {
                     console.error(err);
                     alert("Zahlung fehlgeschlagen.");
@@ -380,14 +395,13 @@
             },
 
             onError(err) {
-                console.error("PAYPAL ERROR FULL:", err);
-                alert("PayPal Fehler: " + (err?.message || JSON.stringify(err)));
+                console.error("PayPal Error:", err);
+                alert("PayPal Fehler");
             }
         });
 
         paypalButtonsInstance.render("#paypal-button-container");
     }
-
     /* ========================================
        TOTALS UPDATE (WICHTIGER FIX)
     ======================================== */
@@ -400,7 +414,6 @@
         shippingElement.textContent = formatPrice(p.shipping);
         discountElement.textContent = "-" + formatPrice(p.discount);
         totalElement.textContent = formatPrice(p.total);
-
     }
 
     /* ========================================
@@ -443,7 +456,7 @@
 
         discountMessage.textContent = `${discountPercent}% Rabatt aktiv.`;
 
-        updateTotals(); 
+        updateTotals(); // 🔥 triggert jetzt auch PayPal korrekt
     }
 
     discountButton.addEventListener("click", applyDiscountCode);
