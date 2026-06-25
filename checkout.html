@@ -146,7 +146,13 @@
         src="https://www.paypal.com/sdk/js?client-id=Ac4DxvlVow2_0I7rIbtTTBKDcIgQpVpROfQQYiIyaHHnWQGEB_Us8VclfRc-ESbF5HMvGcaxWZH92hxy&currency=EUR"></script>
 
     <script>
-        const cart = JSON.parse(localStorage.getItem("cart")) || [];
+        let cart = [];
+
+        try {
+            cart = JSON.parse(localStorage.getItem("cart")) || [];
+        } catch {
+            cart = [];
+        }
 
         if (cart.length === 0) {
             alert("Ihr Warenkorb ist leer.");
