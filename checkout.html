@@ -401,8 +401,6 @@
         discountElement.textContent = "-" + formatPrice(p.discount);
         totalElement.textContent = formatPrice(p.total);
 
-        // 🔥 wichtig: PayPal neu rendern wenn Preis sich ändert
-        renderPayPal();
     }
 
     /* ========================================
@@ -411,6 +409,7 @@
 
     updateTotals();
     renderPayPal();
+
 
     /* ========================================
        RABATTCODE
@@ -444,7 +443,7 @@
 
         discountMessage.textContent = `${discountPercent}% Rabatt aktiv.`;
 
-        updateTotals(); // 🔥 triggert jetzt auch PayPal korrekt
+        updateTotals(); 
     }
 
     discountButton.addEventListener("click", applyDiscountCode);
