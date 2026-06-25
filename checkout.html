@@ -380,8 +380,8 @@
             },
 
             onError(err) {
-                console.error(err);
-                alert("PayPal Fehler");
+                console.error("PAYPAL ERROR FULL:", err);
+                alert("PayPal Fehler: " + (err?.message || JSON.stringify(err)));
             }
         });
 
