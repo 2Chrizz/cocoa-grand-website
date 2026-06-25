@@ -22,41 +22,53 @@ closeCart.onclick = () => {
   cartSidebar.classList.remove("open");
 };
 
+
 /* ========================= */
-/* PRODUKT MENGENWAHL */
+/* MENGEN STEUERUNG (FIXED) */
 /* ========================= */
 
-document.querySelectorAll(".plus").forEach((btn) => {
-  btn.addEventListener("click", () => {
-    const input = btn.parentElement.querySelector(".qty-input");
-    input.value = parseInt(input.value) + 1;
-  });
-});
-document.querySelectorAll(".minus").forEach((btn) => {
-  btn.addEventListener("click", () => {
-    const input = btn.parentElement.querySelector(".qty-input");
-    let value = parseInt(input.value);
-    if (value > 1) {
-      input.value = value - 1;
-    }
-  });
-});
-/* ========================= */
-/* MENGENEINGABE VALIDIEREN */
-/* ========================= */
+function getInput(btn) {
+  return btn.closest(".quantity-selector")?.querySelector(".qty-input");
+}
 
-document.querySelectorAll(".qty-input").forEach((input) => {
-  function validate() {
-    let value = parseInt(input.value);
-    if (isNaN(value)) value = 1;
-    value = Math.max(1, value);
-    value = Math.min(99, value);
-    input.value = value;
+/* PLUS / MINUS (EVENT DELEGATION) */
+document.addEventListener("click", (e) => {
+  const plus = e.target.closest(".plus");
+  const minus = e.target.closest(".minus");
+
+  if (plus) {
+    const input = getInput(plus);
+    if (!input) return;
+
+    input.value = Math.min(99, Number(input.value || 1) + 1);
+    input.dispatchEvent(new Event("input")); // wichtig!
   }
-  input.addEventListener("input", validate);
-  input.addEventListener("blur", validate);
+
+  if (minus) {
+    const input = getInput(minus);
+    if (!input) return;
+
+    input.value = Math.max(1, Number(input.value || 1) - 1);
+    input.dispatchEvent(new Event("input")); // wichtig!
+  }
 });
 
+/* INPUT VALIDIERUNG */
+document.addEventListener("input", (e) => {
+  if (!e.target.classList.contains("qty-input")) return;
+
+  let val = e.target.value;
+
+  if (val === "") return;
+
+  val = parseInt(val, 10);
+
+  if (isNaN(val)) val = 1;
+
+  val = Math.max(1, Math.min(99, val));
+
+  e.target.value = val;
+});
 /* ========================= */
 /* IN DEN WARENKORB */
 /* ========================= */
