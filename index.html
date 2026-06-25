@@ -563,48 +563,83 @@
   <!-- ======================================== -->
 
   <div id="cart-sidebar" class="cart-sidebar">
-    <div class="cart-header">
-      <h3>Warenkorb</h3>
 
-      <button id="close-cart">✕</button>
+    <div class="cart-header">
+      <h3>
+        <i class="fa-solid fa-cart-shopping"></i>
+        Warenkorb
+      </h3>
+
+      <button id="close-cart" aria-label="Warenkorb schließen">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
     </div>
 
     <div id="cart-items" class="cart-items">
-      <p class="empty-cart">Dein Warenkorb ist leer.</p>
+      <p class="empty-cart">
+        <i class="fa-solid fa-basket-shopping"></i>
+        Dein Warenkorb ist aktuell leer.
+      </p>
     </div>
+
+    <!-- SHOP INFO -->
+
     <div class="shop-info">
+
       <div class="shop-info-item">
-        <i class="fa-solid fa-truck"></i>
-        Versandkosten: 3,95 €
+        <i class="fa-solid fa-truck-fast"></i>
+        <div>
+          <strong>Versand</strong>
+          <span>3,95 € deutschlandweit</span>
+        </div>
       </div>
 
       <div class="shop-info-item">
-        <i class="fa-solid fa-box"></i>
-        Versandfrei ab 39,99 €
+        <i class="fa-solid fa-gift"></i>
+        <div>
+          <strong>Kostenloser Versand</strong>
+          <span>ab 39,99 € Bestellwert</span>
+        </div>
       </div>
 
       <div class="shop-info-item">
         <i class="fa-solid fa-clock"></i>
-        Lieferzeit 2–4 Werktage
+        <div>
+          <strong>Lieferzeit</strong>
+          <span>2–4 Werktage</span>
+        </div>
       </div>
 
       <div class="shop-info-item">
-        <i class="fa-solid fa-shield-halved"></i>
-        Sichere Zahlung mit PayPal
+        <i class="fa-brands fa-paypal"></i>
+        <div>
+          <strong>Sichere Zahlung</strong>
+          <span>PayPal Checkout</span>
+        </div>
       </div>
+
     </div>
 
-    <div class="cart-footer">
-      <div class="cart-total">
-        Gesamt:
+    <!-- FOOTER -->
 
-        <span id="cart-total"> 0,00€ </span>
+    <div class="cart-footer">
+
+      <div class="cart-total">
+        <span>Gesamtsumme</span>
+        <span id="cart-total">0,00 €</span>
       </div>
 
       <button id="checkout-btn" class="btn btn-primary cart-checkout">
+        <i class="fa-solid fa-credit-card"></i>
         Zur Kasse
       </button>
+
+      <small class="cart-note">
+        Preise zzgl. Versandkosten
+      </small>
+
     </div>
+
   </div>
   <!-- ======================================== -->
   <!-- FOOTER -->
