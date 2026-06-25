@@ -309,7 +309,7 @@
 
         const discountedSubtotal = Math.max(0, subtotalCents - discountCents);
 
-        const shippingCents = discountedSubtotal < 3999 ? 395 : 0;
+        const shippingCents = discountedSubtotal < 4000 ? 395 : 0;
 
         const totalCents = discountedSubtotal + shippingCents;
 
@@ -456,7 +456,7 @@
 
         discountMessage.textContent = `${discountPercent}% Rabatt aktiv.`;
 
-        updateTotals(); 
+        updateTotals(); // 🔥 triggert jetzt auch PayPal korrekt
     }
 
     discountButton.addEventListener("click", applyDiscountCode);
