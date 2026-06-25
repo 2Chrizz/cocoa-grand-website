@@ -85,14 +85,14 @@ document.querySelectorAll(".add-to-cart").forEach((button) => {
     const id = button.dataset.id;
     const existing = cart.find((item) => item.id === id);
     if (existing) {
-      existing.qty += qty;
+      existing.qty = Math.min(99, existing.qty + qty);
     } else {
       cart.push({
         id: id,
         name: button.dataset.name,
         size: button.dataset.size,
         price: parseFloat(button.dataset.price),
-        qty: qty,
+        qty: Math.min(99, qty),
       });
     }
     qtyInput.value = 1;
@@ -170,6 +170,7 @@ function changeQty(id, amount) {
   const item = cart.find((item) => item.id === id);
   if (!item) return;
   item.qty += amount;
+  item.qty = Math.max(1, Math.min(99, item.qty));
   if (item.qty <= 0) {
     removeItem(id);
     return;
