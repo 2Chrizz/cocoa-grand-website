@@ -1,17 +1,16 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="de">
 
-    <head>
+<head>
+    <meta charset="UTF-8" />
 
-        <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout | COCOA GRAND</title>
 
-        <title>Checkout | COCOA GRAND</title>
+    <link rel="stylesheet" href="css/style.css" />
 
-        <link rel="stylesheet" href="css/style.css">
-
-        <style>
+    <style>
         .checkout-container {
             max-width: 900px;
             margin: 120px auto;
@@ -29,7 +28,7 @@
             justify-content: space-between;
             align-items: center;
             padding: 15px 0;
-            border-bottom: 1px solid rgba(255, 255, 255, .1);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         .checkout-summary {
@@ -73,110 +72,89 @@
             font-size: 0.9rem;
         }
     </style>
-        <link rel="stylesheet"
-            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+</head>
 
-    </head>
+<body>
+    <div class="checkout-container">
+        <h1>Checkout</h1>
 
-    <body>
+        <div class="checkout-box">
+            <div id="checkout-items"></div>
 
-        <div class="checkout-container">
+            <div class="discount-box">
+                <input type="text" id="discount-code" placeholder="Rabattcode eingeben" />
 
-            <h1>Checkout</h1>
+                <button id="apply-discount">Einlösen</button>
 
-            <div class="checkout-box">
-
-                <div id="checkout-items"></div>
-
-                <div class="discount-box">
-
-                    <input type="text" id="discount-code"
-                        placeholder="Rabattcode eingeben">
-
-                    <button id="apply-discount">
-                        Einlösen
-                    </button>
-
-                    <div id="discount-message"></div>
-
-                </div>
-
-                <div class="checkout-summary">
-
-                    <div class="summary-row">
-                        <span>Zwischensumme</span>
-                        <span id="subtotal">0,00 €</span>
-                    </div>
-
-                    <div class="summary-row">
-                        <span>Versand</span>
-                        <span id="shipping">0,00 €</span>
-                    </div>
-
-                    <div class="summary-row">
-                        <span>Rabatt</span>
-                        <span id="discount">0,00 €</span>
-                    </div>
-
-                    <div class="summary-row summary-total">
-                        <span>Gesamt</span>
-                        <span id="total">0,00 €</span>
-                    </div>
-
-                    <p class="checkout-legal">
-
-                        Mit Abschluss der Bestellung akzeptieren Sie unsere
-
-                        <a href="agb.html">AGB</a>,
-                        <a href="widerruf.html">Widerrufsbelehrung</a>
-                        und
-                        <a href="datenschutz.html">Datenschutzerklärung</a>.
-
-                    </p>
-
-                </div>
-
-                <div id="paypal-button-container"></div>
-
-                <div class="shop-info">
-
-                    <div class="shop-info-item">
-                        <i class="fa-solid fa-shield-halved"></i>
-                        Sichere Zahlung mit PayPal
-                    </div>
-
-                    <div class="shop-info-item">
-                        <i class="fa-solid fa-box"></i>
-                        Versandfrei ab 39,99 €
-                    </div>
-
-                    <div class="shop-info-item">
-                        <i class="fa-solid fa-truck"></i>
-                        Versand in 2–4 Werktagen
-                    </div>
-
-                </div>
-
+                <div id="discount-message"></div>
             </div>
 
+            <div class="checkout-summary">
+                <div class="summary-row">
+                    <span>Zwischensumme</span>
+                    <span id="subtotal">0,00 €</span>
+                </div>
+
+                <div class="summary-row">
+                    <span>Versand</span>
+                    <span id="shipping">0,00 €</span>
+                </div>
+
+                <div class="summary-row">
+                    <span>Rabatt</span>
+                    <span id="discount">0,00 €</span>
+                </div>
+
+                <div class="summary-row summary-total">
+                    <span>Gesamt</span>
+                    <span id="total">0,00 €</span>
+                </div>
+
+                <p class="checkout-legal">
+                    Mit Abschluss der Bestellung akzeptieren Sie unsere
+
+                    <a href="agb.html">AGB</a>,
+                    <a href="widerruf.html">Widerrufsbelehrung</a>
+                    und
+                    <a href="datenschutz.html">Datenschutzerklärung</a>.
+                </p>
+            </div>
+
+            <div id="paypal-button-container"></div>
+
+            <div class="shop-info">
+                <div class="shop-info-item">
+                    <i class="fa-solid fa-shield-halved"></i>
+                    Sichere Zahlung mit PayPal
+                </div>
+
+                <div class="shop-info-item">
+                    <i class="fa-solid fa-box"></i>
+                    Versandfrei ab 39,99 €
+                </div>
+
+                <div class="shop-info-item">
+                    <i class="fa-solid fa-truck"></i>
+                    Versand in 2–4 Werktagen
+                </div>
+            </div>
         </div>
+    </div>
 
-        <script
-            src="https://www.paypal.com/sdk/js?client-id=Ac4DxvlVow2_0I7rIbtTTBKDcIgQpVpROfQQYiIyaHHnWQGEB_Us8VclfRc-ESbF5HMvGcaxWZH92hxy&currency=EUR"></script>
+    <script
+        src="https://www.paypal.com/sdk/js?client-id=Ac4DxvlVow2_0I7rIbtTTBKDcIgQpVpROfQQYiIyaHHnWQGEB_Us8VclfRc-ESbF5HMvGcaxWZH92hxy&currency=EUR"></script>
 
-        <script>
-
-        const cart =
-            JSON.parse(localStorage.getItem("cart")) || [];
+    <script>
+        const cart = JSON.parse(localStorage.getItem("cart")) || [];
 
         if (cart.length === 0) {
+            alert("Ihr Warenkorb ist leer.");
 
             window.location.href = "index.html";
-
         }
 
-        const checkoutItems =
-            document.getElementById("checkout-items");
+        const checkoutItems = document.getElementById("checkout-items");
 
         let subtotal = 0;
 
@@ -184,19 +162,15 @@
         let discountPercent = 0;
 
         const discountCodes = {
-
-            "SOMMER26": {
+            SOMMER26: {
                 percent: 26,
-                expires: "2026-06-29"
-            }
-
+                expires: "2026-06-29",
+            },
         };
 
         // Produkte aus Warenkorb anzeigen
-        cart.forEach(item => {
-
-            const itemTotal =
-                item.price * item.qty;
+        cart.forEach((item) => {
+            const itemTotal = item.price * item.qty;
 
             subtotal += itemTotal;
 
@@ -227,44 +201,34 @@
     </div>
 
     `;
-
         });
 
         // Zentrale Preisberechnung
         function getPriceData() {
+            const subtotalCents = Math.round(subtotal * 100);
 
-            const safeSubtotal =
-                Math.max(0, subtotal - discountAmount);
+            const discountCents = Math.round(discountAmount * 100);
 
-            const shipping =
-                safeSubtotal < 39.99 ? 3.95 : 0;
+            const safeSubtotalCents = Math.max(0, subtotalCents - discountCents);
 
-            const total =
-                safeSubtotal + shipping;
+            const shippingCents = safeSubtotalCents < 3999 ? 395 : 0;
+
+            const totalCents = safeSubtotalCents + shippingCents;
 
             return {
+                itemTotal: subtotalCents / 100,
 
-                safeSubtotal,
+                discount: discountCents / 100,
 
-                shipping,
+                shipping: shippingCents / 100,
 
-                total,
-
-                itemTotal:
-                    Number(subtotal.toFixed(2)),
-
-                discount:
-                    Number(discountAmount.toFixed(2))
-
+                total: totalCents / 100,
             };
-
         }
 
         // Preise im Frontend aktualisieren
         function updateTotals() {
-
-            const prices =
-                getPriceData();
+            const prices = getPriceData();
 
             document.getElementById("subtotal").textContent =
                 subtotal.toFixed(2) + " €";
@@ -277,204 +241,185 @@
 
             document.getElementById("total").textContent =
                 prices.total.toFixed(2) + " €";
-
         }
 
         updateTotals();
 
-        // Rabattcode einlösen
-        document
-            .getElementById("apply-discount")
-            .addEventListener("click", () => {
+        /* ========================= */
+        /* RABATTCODE EINLÖSEN */
+        /* ========================= */
 
-                const code =
-                    document
-                        .getElementById("discount-code")
-                        .value
-                        .trim()
-                        .toUpperCase();
+        const discountButton =
+            document.getElementById("apply-discount");
 
-                const msg =
-                    document.getElementById("discount-message");
+        const discountInput =
+            document.getElementById("discount-code");
 
-                const entry =
-                    discountCodes[code];
+        const discountMessage =
+            document.getElementById("discount-message");
 
-                // 1. Code existiert nicht
-                if (!entry) {
+        discountButton.addEventListener("click", () => {
 
-                    msg.textContent =
-                        "Ungültiger Rabattcode.";
+            if (discountPercent > 0) {
 
-                    return;
+                discountMessage.textContent =
+                    "Es wurde bereits ein Rabattcode angewendet.";
 
-                }
-
-                // 2. Ablaufdatum prüfen
-                const today =
-                    new Date();
-
-                const expiry =
-                    new Date(
-                        entry.expires + "T23:59:59"
-                    );
-
-                if (today > expiry) {
-
-                    msg.textContent =
-                        "Dieser Rabattcode ist abgelaufen.";
-
-                    return;
-
-                }
-
-                // 3. Rabatt berechnen
-                discountPercent =
-                    entry.percent;
-
-                discountAmount =
-                    subtotal *
-                    (discountPercent / 100);
-
-                discountAmount =
-                    Number(
-                        discountAmount.toFixed(2)
-                    );
-
-                // 4. Preise neu berechnen
-                updateTotals();
-
-                msg.textContent =
-                    `Code ${code} angewendet: ${discountPercent}% Rabatt!`;
-
-            });
-
-        // PayPal
-        paypal.Buttons({
-
-            createOrder(data, actions) {
-
-                const prices =
-                    getPriceData();
-
-                const finalTotal =
-                    (
-                        prices.itemTotal +
-                        prices.shipping -
-                        prices.discount
-                    ).toFixed(2);
-
-                console.log("subtotal:", prices.itemTotal);
-                console.log("discount:", prices.discount);
-                console.log("shipping:", prices.shipping);
-                console.log("total:", finalTotal);
-
-                return actions.order.create({
-
-                    purchase_units: [{
-
-                        amount: {
-
-                            currency_code: "EUR",
-
-                            value: finalTotal,
-
-                            breakdown: {
-
-                                item_total: {
-                                    currency_code: "EUR",
-                                    value:
-                                        prices.itemTotal.toFixed(2)
-                                },
-
-                                shipping: {
-                                    currency_code: "EUR",
-                                    value:
-                                        prices.shipping.toFixed(2)
-                                },
-
-                                discount: {
-                                    currency_code: "EUR",
-                                    value:
-                                        prices.discount.toFixed(2)
-                                }
-
-                            }
-
-                        },
-
-                        items: cart.map(item => ({
-
-                            name:
-                                item.name +
-                                " " +
-                                item.size,
-
-                            unit_amount: {
-                                currency_code: "EUR",
-                                value:
-                                    Number(item.price)
-                                        .toFixed(2)
-                            },
-
-                            quantity:
-                                item.qty.toString()
-
-                        }))
-
-                    }]
-
-                })
-
-                    .catch(err => {
-
-                        console.error(
-                            "CREATE ORDER ERROR:",
-                            err
-                        );
-
-                        throw err;
-
-                    });
-
-            },
-
-            onApprove(data, actions) {
-
-                return actions.order.capture()
-                    .then(details => {
-
-                        console.log(
-                            "Zahlung erfolgreich:",
-                            details
-                        );
-
-                        localStorage.removeItem("cart");
-
-                        window.location.href =
-                            "success.html";
-
-                    });
-
-            },
-
-            onError(err) {
-
-                console.error(
-                    "PayPal Error:",
-                    err
-                );
-
-                alert(
-                    "Bei der PayPal-Zahlung ist ein Fehler aufgetreten."
-                );
+                return;
 
             }
 
-        }).render("#paypal-button-container");
+            const code =
+                discountInput.value
+                    .trim()
+                    .toUpperCase();
 
+            const entry =
+                discountCodes[code];
+
+            // Code existiert nicht
+
+            if (!entry) {
+
+                discountMessage.textContent =
+                    "Ungültiger Rabattcode.";
+
+                return;
+
+            }
+
+            // Ablaufdatum prüfen
+
+            const today =
+                new Date();
+
+            const expiry =
+                new Date(
+                    entry.expires + "T23:59:59"
+                );
+
+            if (today > expiry) {
+
+                discountMessage.textContent =
+                    "Dieser Rabattcode ist abgelaufen.";
+
+                return;
+
+            }
+
+            // Rabatt berechnen
+
+            discountPercent =
+                entry.percent;
+
+            discountAmount =
+                Math.round(
+                    subtotal *
+                    (discountPercent / 100) *
+                    100
+                ) / 100;
+
+            // Preise aktualisieren
+
+            updateTotals();
+
+            // Weitere Eingaben verhindern
+
+            discountButton.disabled = true;
+
+            discountInput.disabled = true;
+
+            discountMessage.textContent =
+                `Code ${code} angewendet: ${discountPercent}% Rabatt!`;
+
+        });
+        // PayPal
+        paypal
+            .Buttons({
+                createOrder(data, actions) {
+                    const prices = getPriceData();
+
+                    const finalTotal = prices.total.toFixed(2);
+
+                    console.log("subtotal:", prices.itemTotal);
+                    console.log("discount:", prices.discount);
+                    console.log("shipping:", prices.shipping);
+                    console.log("total:", finalTotal);
+
+                    console.log("PayPal Checkout");
+
+                    console.log(prices);
+
+                    return actions.order
+                        .create({
+                            purchase_units: [
+                                {
+                                    amount: {
+                                        currency_code: "EUR",
+
+                                        value: finalTotal,
+
+                                        breakdown: {
+                                            item_total: {
+                                                currency_code: "EUR",
+                                                value: prices.itemTotal.toFixed(2),
+                                            },
+
+                                            shipping: {
+                                                currency_code: "EUR",
+                                                value: prices.shipping.toFixed(2),
+                                            },
+
+                                            discount: {
+                                                currency_code: "EUR",
+                                                value: prices.discount.toFixed(2),
+                                            },
+                                        },
+                                    },
+
+                                    items: cart.map((item) => ({
+                                        name: item.name + " " + item.size,
+
+                                        unit_amount: {
+                                            currency_code: "EUR",
+                                            value: Number(item.price).toFixed(2),
+                                        },
+
+                                        quantity: Math.max(1, parseInt(item.qty)).toString(),
+                                    })),
+                                },
+                            ],
+                        })
+
+                        .catch((err) => {
+                            console.error("CREATE ORDER ERROR:", err);
+
+                            throw err;
+                        });
+                },
+
+                onApprove(data, actions) {
+                    return actions.order.capture().then((details) => {
+                        console.log("Zahlung erfolgreich:", details);
+
+                        localStorage.removeItem("cart");
+
+                        window.location.href = "success.html";
+                    });
+                },
+
+                onError(err) {
+                    console.error("PayPal Error:", err);
+
+                    alert(
+                        "PayPal konnte die Bestellung nicht erstellen. Bitte Seite neu laden oder später erneut versuchen.",
+                    );
+
+                    console.error(err);
+                },
+            })
+            .render("#paypal-button-container");
     </script>
-
-    </body>
+</body>
 
 </html>
