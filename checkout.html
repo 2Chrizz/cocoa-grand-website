@@ -224,7 +224,7 @@
     src="https://www.paypal.com/sdk/js?client-id=Ac4DxvlVow2_0I7rIbtTTBKDcIgQpVpROfQQYiIyaHHnWQGEB_Us8VclfRc-ESbF5HMvGcaxWZH92hxy&currency=EUR"></script>
 <script>
     /* ========================================
-        WARENKORB LADEN
+       WARENKORB LADEN
     ======================================== */
 
     let cart = [];
@@ -276,140 +276,60 @@
        PRODUKTE RENDERN
     ======================================== */
 
-    const subtotal = cart.reduce((sum, item) => {
-        return sum + Number(item.price) * Number(item.qty);
-    }, 0);
+    const subtotal = cart.reduce((sum, item) =>
+        sum + Number(item.price) * Number(item.qty), 0
+    );
 
-    checkoutItems.innerHTML = cart
-        .map((item) => {
-            const itemTotal = Number(item.price) * Number(item.qty);
+    checkoutItems.innerHTML = cart.map(item => {
+        const itemTotal = Number(item.price) * Number(item.qty);
 
-            return `
-            <div class="checkout-item">
-                <div>
-                    <div class="checkout-product-name">
-                        ${item.name}
-                    </div>
-
-                    ${item.size
-                    ? `
-                        <div class="checkout-product-size">
-                            ${item.size}
-                        </div>
-                    `
-                    : ""
-                }
-
-                    <div class="checkout-product-qty">
-                        Menge: ${item.qty}
-                    </div>
-                </div>
-
-                <div class="checkout-product-price">
-                    ${formatPrice(itemTotal)}
-                </div>
+        return `
+        <div class="checkout-item">
+            <div>
+                <div class="checkout-product-name">${item.name}</div>
+                ${item.size ? `<div class="checkout-product-size">${item.size}</div>` : ""}
+                <div class="checkout-product-qty">Menge: ${item.qty}</div>
             </div>
-        `;
-        })
-        .join("");
+
+            <div class="checkout-product-price">
+                ${formatPrice(itemTotal)}
+            </div>
+        </div>
+    `;
+    }).join("");
 
     /* ========================================
-       PREISE BERECHNEN
+       PREISE
     ======================================== */
 
     function getPriceData() {
 
         const subtotalCents = Math.round(subtotal * 100);
-
         const discountCents = Math.round(discountAmount * 100);
 
-        const discountedSubtotal =
-            Math.max(0, subtotalCents - discountCents);
+        const discountedSubtotal = Math.max(0, subtotalCents - discountCents);
 
-        const shippingCents =
-            discountedSubtotal < 3999 ? 395 : 0;
-
-        const totalCents =
-            discountedSubtotal + shippingCents;
+        const shippingCents = discountedSubtotal < 3999 ? 395 : 0;
 
         return {
             itemTotal: subtotalCents / 100,
             discount: discountCents / 100,
             shipping: shippingCents / 100,
-            total: totalCents / 100
+            total: (discountedSubtotal + shippingCents) / 100
         };
     }
 
-    function updateTotals() {
-
-        const prices = getPriceData();
-
-        subtotalElement.textContent =
-            formatPrice(prices.itemTotal);
-
-        shippingElement.textContent =
-            formatPrice(prices.shipping);
-
-        discountElement.textContent =
-            "-" + formatPrice(prices.discount);
-
-        totalElement.textContent =
-            formatPrice(prices.total);
-    }
-
-    updateTotals();
-
     /* ========================================
-       RABATTCODE
+       PAYPAL (WICHTIG: nur 1x rendern!)
     ======================================== */
 
-    function applyDiscountCode() {
-
-        if (discountPercent > 0) {
-            discountMessage.textContent = "Es wurde bereits ein Rabattcode angewendet.";
-            return;
-        }
-
-        const code = discountInput.value.trim().toUpperCase();
-        const entry = discountCodes[code];
-
-        if (!entry) {
-            discountMessage.textContent = "Ungültiger Rabattcode.";
-            return;
-        }
-
-        const expiry = new Date(entry.expires + "T23:59:59");
-
-        if (Date.now() > expiry.getTime()) {
-            discountMessage.textContent = "Dieser Rabattcode ist abgelaufen.";
-            return;
-        }
-
-        discountPercent = entry.percent;
-
-        discountAmount =
-            Math.round(subtotal * (discountPercent / 100) * 100) / 100;
-
-        discountInput.disabled = true;
-        discountButton.disabled = true;
-
-        discountMessage.textContent = `${discountPercent}% Rabatt erfolgreich angewendet.`;
-
-        updateTotals();
-    }
-
-    /* ========================================
-       PAYPAL
-    ======================================== */
     let paypalButtonsInstance = null;
 
     function renderPayPal() {
 
         const container = document.getElementById("paypal-button-container");
-
         if (!window.paypal || !container) return;
 
-        // alten Button sauber entfernen
         container.innerHTML = "";
 
         const prices = getPriceData();
@@ -417,21 +337,22 @@
         paypalButtonsInstance = paypal.Buttons({
 
             createOrder(data, actions) {
-                const prices = getPriceData();
+
+                const p = getPriceData();
 
                 return actions.order.create({
                     purchase_units: [{
                         amount: {
                             currency_code: "EUR",
-                            value: prices.total.toFixed(2),
+                            value: p.total.toFixed(2),
                             breakdown: {
                                 item_total: {
                                     currency_code: "EUR",
-                                    value: (prices.itemTotal - prices.discount).toFixed(2)
+                                    value: (p.itemTotal - p.discount).toFixed(2)
                                 },
                                 shipping: {
                                     currency_code: "EUR",
-                                    value: prices.shipping.toFixed(2)
+                                    value: p.shipping.toFixed(2)
                                 }
                             }
                         },
@@ -450,10 +371,8 @@
             async onApprove(data, actions) {
                 try {
                     await actions.order.capture();
-
                     localStorage.removeItem("cart");
                     window.location.href = "success.html";
-
                 } catch (err) {
                     console.error(err);
                     alert("Zahlung fehlgeschlagen.");
@@ -469,18 +388,70 @@
         paypalButtonsInstance.render("#paypal-button-container");
     }
 
-    renderPayPal();
+    /* ========================================
+       TOTALS UPDATE (WICHTIGER FIX)
+    ======================================== */
 
     function updateTotals() {
-        const prices = getPriceData();
 
-        subtotalElement.textContent = formatPrice(prices.itemTotal);
-        shippingElement.textContent = formatPrice(prices.shipping);
-        discountElement.textContent = "-" + formatPrice(prices.discount);
-        totalElement.textContent = formatPrice(prices.total);
+        const p = getPriceData();
 
+        subtotalElement.textContent = formatPrice(p.itemTotal);
+        shippingElement.textContent = formatPrice(p.shipping);
+        discountElement.textContent = "-" + formatPrice(p.discount);
+        totalElement.textContent = formatPrice(p.total);
+
+        // 🔥 wichtig: PayPal neu rendern wenn Preis sich ändert
+        renderPayPal();
     }
 
+    /* ========================================
+       INITIAL
+    ======================================== */
+
+    updateTotals();
+    renderPayPal();
+
+    /* ========================================
+       RABATTCODE
+    ======================================== */
+
+    function applyDiscountCode() {
+
+        if (discountPercent > 0) {
+            discountMessage.textContent = "Rabatt bereits aktiv.";
+            return;
+        }
+
+        const code = discountInput.value.trim().toUpperCase();
+        const entry = discountCodes[code];
+
+        if (!entry) {
+            discountMessage.textContent = "Ungültiger Code.";
+            return;
+        }
+
+        if (Date.now() > new Date(entry.expires + "T23:59:59").getTime()) {
+            discountMessage.textContent = "Code abgelaufen.";
+            return;
+        }
+
+        discountPercent = entry.percent;
+        discountAmount = Math.round(subtotal * (discountPercent / 100) * 100) / 100;
+
+        discountInput.disabled = true;
+        discountButton.disabled = true;
+
+        discountMessage.textContent = `${discountPercent}% Rabatt aktiv.`;
+
+        updateTotals(); // 🔥 triggert jetzt auch PayPal korrekt
+    }
+
+    discountButton.addEventListener("click", applyDiscountCode);
+
+    discountInput.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") applyDiscountCode();
+    });
 </script>
 </body>
 
