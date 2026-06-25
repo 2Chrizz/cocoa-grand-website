@@ -26,7 +26,9 @@
         .checkout-item {
             display: flex;
             justify-content: space-between;
-            align-items: center;
+            align-items: flex-start;
+            gap: 10px;
+            flex-wrap: wrap;
             padding: 15px 0;
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
@@ -53,23 +55,59 @@
 
         .discount-box {
             margin: 20px 0;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
         }
 
         .discount-box input {
+            flex: 1;
             padding: 10px;
+            min-width: 180px;
             border-radius: 8px;
             border: 1px solid #444;
         }
 
         .discount-box button {
             padding: 10px 15px;
-            margin-left: 10px;
+            margin-left: 0px;
             cursor: pointer;
         }
 
         #discount-message {
             margin-top: 10px;
             font-size: 0.9rem;
+        }
+
+        @media (max-width: 600px) {
+
+            .checkout-container {
+                margin: 40px auto;
+                padding: 12px;
+            }
+
+            .checkout-box {
+                padding: 18px;
+            }
+
+            .summary-total {
+                font-size: 1.2rem;
+            }
+
+            .shop-info {
+                display: flex;
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .checkout-item {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .checkout-product-price {
+                margin-top: 8px;
+            }
         }
     </style>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
@@ -149,8 +187,13 @@
         let cart = [];
 
         try {
-            cart = JSON.parse(localStorage.getItem("cart")) || [];
-        } catch {
+            const savedCart = localStorage.getItem("cart");
+
+            if (savedCart) {
+                cart = JSON.parse(savedCart);
+            }
+        } catch (e) {
+            console.error("localStorage Fehler:", e);
             cart = [];
         }
 
@@ -191,7 +234,7 @@
             </div>
 
             <div class="checkout-product-size">
-                ${item.size}
+                ${item.size || ""}
             </div>
 
             <div class="checkout-product-qty">
@@ -295,14 +338,18 @@
             }
 
             // Ablaufdatum prüfen
+            const today = new Date();
 
-            const today =
-                new Date();
+            const [year, month, day] = entry.expires.split("-");
 
-            const expiry =
-                new Date(
-                    entry.expires + "T23:59:59"
-                );
+            const expiry = new Date(
+                Number(year),
+                Number(month) - 1,
+                Number(day),
+                23,
+                59,
+                59
+            );
 
             if (today > expiry) {
 
@@ -340,91 +387,137 @@
 
         });
         // PayPal
+
+        if (!cart.length) {
+            return;
+        }
+
         paypal
-            .Buttons({
+        window.addEventListener("load", () => {
+
+            const paypalContainer =
+                document.getElementById("paypal-button-container");
+
+            if (typeof paypal === "undefined") {
+
+                console.error("PayPal SDK konnte nicht geladen werden.");
+
+                if (paypalContainer) {
+                    paypalContainer.innerHTML =
+                        "<p>PayPal konnte nicht geladen werden. Bitte Seite neu laden.</p>";
+                }
+
+                return;
+            }
+
+            paypal.Buttons({
+
                 createOrder(data, actions) {
+
                     const prices = getPriceData();
 
-                    const finalTotal = prices.total.toFixed(2);
+                    const finalTotal =
+                        prices.total.toFixed(2);
 
-                    console.log("subtotal:", prices.itemTotal);
-                    console.log("discount:", prices.discount);
-                    console.log("shipping:", prices.shipping);
-                    console.log("total:", finalTotal);
+                    return actions.order.create({
+                        purchase_units: [
+                            {
+                                amount: {
+                                    currency_code: "EUR",
 
-                    console.log("PayPal Checkout");
+                                    value: finalTotal,
 
-                    console.log(prices);
+                                    breakdown: {
+                                        item_total: {
+                                            currency_code: "EUR",
+                                            value: (
+                                                prices.itemTotal -
+                                                prices.discount
+                                            ).toFixed(2),
+                                        },
 
-                    return actions.order
-                        .create({
-                            purchase_units: [
-                                {
-                                    amount: {
-                                        currency_code: "EUR",
-
-                                        value: finalTotal,
-
-                                        breakdown: {
-                                            item_total: {
-                                                currency_code: "EUR",
-                                                value: prices.itemTotal.toFixed(2),
-                                            },
-
-                                            shipping: {
-                                                currency_code: "EUR",
-                                                value: prices.shipping.toFixed(2),
-                                            },
-
-                                            discount: {
-                                                currency_code: "EUR",
-                                                value: prices.discount.toFixed(2),
-                                            },
+                                        shipping: {
+                                            currency_code: "EUR",
+                                            value: prices.shipping.toFixed(2),
                                         },
                                     },
-
-                                    items: cart.map((item) => ({
-                                        name: item.name + " " + item.size,
-
-                                        unit_amount: {
-                                            currency_code: "EUR",
-                                            value: Number(item.price).toFixed(2),
-                                        },
-
-                                        quantity: Math.max(1, parseInt(item.qty)).toString(),
-                                    })),
                                 },
-                            ],
-                        })
 
-                        .catch((err) => {
-                            console.error("CREATE ORDER ERROR:", err);
+                                items: cart.map((item) => ({
+                                    name:
+                                        item.name +
+                                        (item.size
+                                            ? " " + item.size
+                                            : ""),
 
-                            throw err;
-                        });
+                                    unit_amount: {
+                                        currency_code: "EUR",
+                                        value: Number(
+                                            item.price
+                                        ).toFixed(2),
+                                    },
+
+                                    quantity: Math.max(
+                                        1,
+                                        parseInt(item.qty, 10)
+                                    ).toString(),
+                                })),
+                            },
+                        ],
+                    });
+
                 },
 
                 onApprove(data, actions) {
-                    return actions.order.capture().then((details) => {
-                        console.log("Zahlung erfolgreich:", details);
 
-                        localStorage.removeItem("cart");
+                    return actions.order
+                        .capture()
+                        .then((details) => {
 
-                        window.location.href = "success.html";
-                    });
+                            console.log(
+                                "Zahlung erfolgreich:",
+                                details
+                            );
+
+                            localStorage.removeItem("cart");
+
+                            window.location.href =
+                                "success.html";
+                        });
+
                 },
 
                 onError(err) {
-                    console.error("PayPal Error:", err);
 
-                    alert(
-                        "PayPal konnte die Bestellung nicht erstellen. Bitte Seite neu laden oder später erneut versuchen.",
+                    console.error(
+                        "PayPal Fehler:",
+                        err
                     );
 
-                    console.error(err);
+                    alert(
+                        "PayPal konnte die Bestellung nicht erstellen. Bitte versuchen Sie es erneut."
+                    );
+
                 },
-            })
-            .render("#paypal-button-container");
+
+            }).render("#paypal-button-container")
+
+                .catch((err) => {
+
+                    console.error(
+                        "PayPal Render Fehler:",
+                        err
+                    );
+
+                    if (paypalContainer) {
+                        paypalContainer.innerHTML =
+                            "<p>PayPal konnte nicht geladen werden.</p>";
+                    }
+
+                });
+
+        });
+
     </script>
 </body>
 
